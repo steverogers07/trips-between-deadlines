@@ -23,7 +23,7 @@ const { title, description, date, location, duration, totalCost, currency, cover
 const { Content } = await render(trip);
 const readingTime = estimateReadingTime(trip.body ?? '');
 const related = await getRelatedTrips(trip, locale);
-const pageUrl = Astro.url.href;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
