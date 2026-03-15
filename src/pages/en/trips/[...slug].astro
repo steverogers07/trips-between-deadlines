@@ -1,0 +1,19 @@
+---
+import TripLayout from '../../../layouts/TripLayout.astro';
+import { getAllTrips, getTripSlug } from '../../../lib/trips';
+import type { Locale } from '../../../i18n/config';
+
+const locale: Locale = 'en';
+
+export async function getStaticPaths() {
+  const trips = await getAllTrips('en');
+  return trips.map((trip) => ({
+    params: { slug: getTripSlug(trip) },
+    props: { trip },
+  }));
+}
+
+const { trip } = Astro.props;
+---
+
+<TripLayout trip={trip} locale={locale} />

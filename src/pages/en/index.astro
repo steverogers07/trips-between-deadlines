@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTrips } from '../../lib/trips';
+import { t, getLocalizedPath } from '../../i18n/utils';
+import { getTripSlug } from '../../lib/trips';
+import type { Locale } from '../../i18n/config';
+
+const locale: Locale = 'en';
+const allTrips = await getAllTrips(locale);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: t(locale, 'site.title'),
+  description: t(locale, 'site.description'),
+  url: Astro.site?.href,
+};
+---
+
+<BaseLayout jsonLd={jsonLd}>
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-4">
+    <h1 class="text-2xl sm:text-3xl font-bold text-charcoal">
+      {t(locale, 'hero.title')}
+    </h1>
+    <p class="mt-2 text-charcoal-light leading-relaxed">
+      {t(locale, 'hero.description')}
+    </p>
+  </section>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <hr class="border-charcoal/10" />
+  </div>
+
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <h2 class="text-lg font-semibold text-charcoal-light uppercase tracking-wide mb-8">
+      {t(locale, 'home.recent')}
+    </h2>
+
+    {allTrips.length > 0 ? (
+      <div class="space-y-8">
+        {allTrips.map((trip) => {
+          const { title, description, date, location, duration, coverImage, category } = trip.data;
+          const slug = getTripSlug(trip);
+          const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+
+          return (
+            <a href={`/${locale}/trips/${slug}`} class="group block">
+              <article class="flex flex-col sm:flex-row gap-5">
+                <div class="sm:w-48 sm:h-32 aspect-video sm:aspect-auto rounded-xl overflow-hidden shrink-0 bg-charcoal/5">
+                  <img
+                    src={coverImage}
+                    alt={title}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 text-xs text-charcoal-light mb-1.5">
+                    <time>{formattedDate}</time>
+                    <span>·</span>
+                    <span>{location}</span>
+                    <span>·</span>
+                    <span>{duration}</span>
+                  </div>
+
+                  <h3 class="text-lg font-bold text-charcoal group-hover:text-primary transition-colors">
+                    {title}
+                  </h3>
+
+                  <p class="mt-1 text-sm text-charcoal-light line-clamp-2 leading-relaxed">
+                    {description}
+                  </p>
+
+                  <div class="mt-2 flex items-center gap-3 text-xs text-charcoal-light">
+                    <span class:list={[
+                      'px-2 py-0.5 rounded-full',
+                      category === 'india'
+                        ? 'bg-accent/10 text-accent'
+                        : 'bg-primary/10 text-primary',
+                    ]}>
+                      {category === 'india' ? 'India' : 'International'}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            </a>
+          );
+        })}
+      </div>
+    ) : (
+      <div class="text-center py-16">
+        <p class="text-4xl mb-3">📝</p>
+        <p class="text-charcoal-light">No entries yet. The first trip is being written...</p>
+      </div>
+    )}
+
+    {allTrips.length > 0 && (
+      <div class="mt-10 text-center">
+        <a
+          href={getLocalizedPath('/journal', locale)}
+          class="text-sm text-charcoal-light hover:text-primary transition-colors"
+        >
+          {t(locale, 'home.readMore')} →
+        </a>
+      </div>
+    )}
+  </section>
+
+  <section class="border-t border-charcoal/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <p class="text-sm text-charcoal-light leading-relaxed">
+        {t(locale, 'home.about.text')}{' '}
+        <a href={getLocalizedPath('/about', locale)} class="text-primary hover:underline">
+          {t(locale, 'home.about.cta')} →
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

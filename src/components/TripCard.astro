@@ -1,0 +1,54 @@
+---
+import type { Trip } from '../lib/trips';
+import { getTripSlug } from '../lib/trips';
+import type { Locale } from '../i18n/config';
+
+interface Props {
+  trip: Trip;
+  locale: Locale;
+}
+
+const { trip, locale } = Astro.props;
+const { title, description, location, duration, coverImage, date } = trip.data;
+const slug = getTripSlug(trip);
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+}).format(date);
+---
+
+<a
+  href={`/${locale}/trips/${slug}`}
+  class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+>
+  <div class="aspect-[16/9] overflow-hidden">
+    <img
+      src={coverImage}
+      alt={title}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+  </div>
+
+  <div class="p-4">
+    <div class="flex items-center gap-2 text-xs text-charcoal-light mb-2">
+      <time>{formattedDate}</time>
+      <span>·</span>
+      <span>{location}</span>
+    </div>
+
+    <h3 class="font-bold text-charcoal group-hover:text-primary transition-colors line-clamp-2">
+      {title}
+    </h3>
+
+    <p class="mt-1.5 text-sm text-charcoal-light line-clamp-2 leading-relaxed">
+      {description}
+    </p>
+
+    <div class="mt-3 text-xs text-charcoal-light">
+      <span>{duration}</span>
+    </div>
+  </div>
+</a>

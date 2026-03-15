@@ -1,0 +1,87 @@
+---
+import { t, getLocalizedPath } from '../i18n/utils';
+import { type Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const navLinks = [
+  { href: getLocalizedPath('/', locale), label: t(locale, 'nav.home') },
+  { href: getLocalizedPath('/journal', locale), label: t(locale, 'nav.journal') },
+  { href: getLocalizedPath('/about', locale), label: t(locale, 'nav.about') },
+];
+---
+
+<header class="sticky top-0 z-50 bg-warm/80 backdrop-blur-md border-b border-charcoal/5">
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <a href={getLocalizedPath('/', locale)} class="flex items-center gap-2 group">
+      <span class="text-2xl">✈️</span>
+      <span class="font-bold text-lg text-charcoal group-hover:text-primary transition-colors">
+        TBD
+      </span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-6">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            'text-sm font-medium transition-colors hover:text-primary',
+            Astro.url.pathname === link.href || (link.href !== getLocalizedPath('/', locale) && Astro.url.pathname.startsWith(link.href))
+              ? 'text-primary'
+              : 'text-charcoal-light',
+          ]}
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+
+    <button
+      id="mobile-menu-btn"
+      class="p-2 rounded-lg text-charcoal hover:bg-charcoal/5 transition-colors md:hidden"
+      aria-label="Toggle menu"
+    >
+      <svg id="menu-open-icon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="menu-close-icon" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </nav>
+
+  <div id="mobile-menu" class="hidden md:hidden border-t border-charcoal/5 bg-warm">
+    <div class="px-4 py-4 space-y-1">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+            Astro.url.pathname === link.href
+              ? 'bg-primary/10 text-primary'
+              : 'text-charcoal-light hover:bg-charcoal/5',
+          ]}
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const openIcon = document.getElementById('menu-open-icon');
+  const closeIcon = document.getElementById('menu-close-icon');
+
+  btn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+    openIcon?.classList.toggle('hidden');
+    closeIcon?.classList.toggle('hidden');
+  });
+</script>

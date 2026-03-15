@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTrips, getTripSlug } from '../../lib/trips';
+import { t } from '../../i18n/utils';
+import type { Locale } from '../../i18n/config';
+
+const locale: Locale = 'en';
+const allTrips = await getAllTrips(locale);
+---
+
+<BaseLayout title={t(locale, 'journal.title')}>
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <h1 class="text-3xl font-bold text-charcoal">
+      {t(locale, 'journal.title')}
+    </h1>
+    <p class="mt-2 text-charcoal-light">
+      {t(locale, 'journal.subtitle')}
+    </p>
+
+    <div class="mt-8 flex items-center gap-2" id="filter-controls">
+      <button data-filter="all"
+        class="filter-btn active px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
+               bg-charcoal text-white">
+        {t(locale, 'journal.all')}
+      </button>
+      <button data-filter="india"
+        class="filter-btn px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
+               bg-charcoal/5 text-charcoal-light">
+        {t(locale, 'journal.india')}
+      </button>
+      <button data-filter="international"
+        class="filter-btn px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
+               bg-charcoal/5 text-charcoal-light">
+        {t(locale, 'journal.international')}
+      </button>
+    </div>
+
+    <div class="mt-8 divide-y divide-charcoal/5" id="journal-list">
+      {allTrips.map((trip) => {
+        const { title, description, date, location, duration, coverImage, category } = trip.data;
+        const slug = getTripSlug(trip);
+        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+
+        return (
+          <a
+            href={`/${locale}/trips/${slug}`}
+            class="journal-entry group block py-6 first:pt-0"
+            data-category={category}
+          >
+            <article class="flex flex-col sm:flex-row gap-4">
+              <div class="sm:w-40 sm:h-28 aspect-video sm:aspect-auto rounded-lg overflow-hidden shrink-0 bg-charcoal/5">
+                <img
+                  src={coverImage}
+                  alt={title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 text-xs text-charcoal-light mb-1">
+                  <time>{formattedDate}</time>
+                  <span>·</span>
+                  <span>{location}</span>
+                </div>
+
+                <h2 class="text-lg font-bold text-charcoal group-hover:text-primary transition-colors">
+                  {title}
+                </h2>
+
+                <p class="mt-1 text-sm text-charcoal-light line-clamp-2">
+                  {description}
+                </p>
+
+                <div class="mt-2 text-xs text-charcoal-light">
+                  <span>{duration}</span>
+                </div>
+              </div>
+            </article>
+          </a>
+        );
+      })}
+    </div>
+
+    {allTrips.length === 0 && (
+      <div class="text-center py-20">
+        <p class="text-2xl">📝</p>
+        <p class="mt-4 text-charcoal-light">Nothing written yet. Check back soon.</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<script>
+  const list = document.getElementById('journal-list');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  if (!list) throw new Error('journal-list not found');
+
+  let currentFilter = 'all';
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.getAttribute('data-filter') || 'all';
+
+      list.querySelectorAll<HTMLElement>('.journal-entry').forEach((el) => {
+        const cat = el.getAttribute('data-category');
+        el.style.display = (currentFilter === 'all' || cat === currentFilter) ? '' : 'none';
+      });
+
+      filterBtns.forEach((b) => {
+        const isActive = b.getAttribute('data-filter') === currentFilter;
+        b.className = `filter-btn px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+          isActive
+            ? 'bg-charcoal text-white'
+            : 'bg-charcoal/5 text-charcoal-light'
+        }`;
+      });
+    });
+  });
+</script>
