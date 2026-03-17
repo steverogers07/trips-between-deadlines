@@ -38,7 +38,10 @@ const stars = Array.from({ length: 5 }, (_, i) => i < rating);
         ))}
       </div>
       <p class="mt-2 text-primary font-bold text-lg">
-        {formatCurrency(costPerNight, currency)}<span class="text-sm font-normal text-charcoal-light">{t(locale, 'trip.perNight')}</span>
+        {costPerNight > 0
+          ? <>{formatCurrency(costPerNight, currency)}<span class="text-sm font-normal text-charcoal-light">{t(locale, 'trip.perNight')}</span></>
+          : <span class="text-sm font-normal text-charcoal-light">Company sponsored</span>
+        }
       </p>
     </div>
 
