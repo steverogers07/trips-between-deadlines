@@ -5,11 +5,18 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
+import rehypeExternalLinks from 'rehype-external-links';
 
 export default defineConfig({
   site: 'https://tripsbetweendeadlines.com',
   output: 'static',
   adapter: vercel(),
+
+  markdown: {
+    rehypePlugins: [
+      [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
+    ],
+  },
 
   vite: {
     plugins: [tailwindcss()],
