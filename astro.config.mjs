@@ -8,7 +8,7 @@ import vercel from '@astrojs/vercel';
 import rehypeExternalLinks from 'rehype-external-links';
 
 export default defineConfig({
-  site: 'https://tripsbetweendeadlines.com',
+  site: 'https://www.trips-between-deadlines.com',
   output: 'static',
   adapter: vercel(),
 

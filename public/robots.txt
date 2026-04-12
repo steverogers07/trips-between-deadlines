@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tripsbetweendeadlines.com/sitemap-index.xml
+Sitemap: https://www.trips-between-deadlines.com/sitemap-index.xml
