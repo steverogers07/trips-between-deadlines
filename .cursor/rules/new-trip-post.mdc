@@ -1,0 +1,104 @@
+---
+description: Guide for creating a new trip blog post — frontmatter schema, image handling, and publishing workflow
+globs: src/content/trips/**/*.mdx
+alwaysApply: false
+---
+
+# Adding a New Trip Blog Post
+
+## Step 1 — Create the MDX File
+
+Create `src/content/trips/en/<slug>.mdx` where `<slug>` is lowercase, hyphenated (e.g. `thailand-pattaya-bangkok-phuket`).
+
+### Required Frontmatter
+
+```yaml
+---
+title: "Country/Place — Subtitle"
+description: "1-2 sentence summary"
+date: YYYY-MM-DD          # trip start date
+location: "City, State/Country"
+country: "Country"
+category: "india" | "international"
+region: "e.g. North India, Southeast Asia"
+duration: "X days"
+totalCost: 40000           # per person, number only
+currency: "INR"
+coverImage: "/images/trips/<slug>/cover.jpeg"
+gallery: []
+tags: ["tag1", "tag2"]
+featured: true
+draft: false
+locale: "en"
+accommodation:
+  - name: "Hotel Name"
+    costPerNight: 1300       # number
+    rating: 4                # 1-5
+    bookingLink: "https://..."  # valid URL or omit entirely
+    mapsLink: "https://..."     # valid URL or omit entirely
+    pros: ["pro1", "pro2"]
+    cons: ["con1"]              # can omit if none
+---
+```
+
+### Schema Rules (will fail build if violated)
+
+- `bookingLink` / `mapsLink`: must be a valid URL or omitted. **Never use empty string `""`**.
+- `rating`: must be between 1 and 5.
+- `category`: must be exactly `"india"` or `"international"`.
+- No extra fields in accommodation objects (e.g. don't add `currency`).
+- Use Google Maps links in `mapsLink`, booking/Airbnb/Klook links in `bookingLink`.
+
+## Step 2 — Write the Content
+
+Follow this structure (see existing posts for examples):
+
+1. **Intro paragraph** — who, when, vibe of the trip
+2. **"Before You Go"** section (visa, SIM, money exchange tips)
+3. **Day-by-day sections** with `## Day N — Title` and `**Date**` subheading
+4. **"What It Cost" table** — per person breakdown
+5. **"Things to Know"** bullet list — practical tips
+6. **"Final Thoughts"** — honest summary
+
+### Image Tags
+
+```html
+<figure>
+  <img src="/images/trips/<slug>/1.jpeg" alt="Description" class="rounded-xl" />
+  <figcaption class="text-sm text-center text-charcoal-light mt-2">Caption text</figcaption>
+</figure>
+```
+
+## Step 3 — Add Images
+
+1. Create directory: `public/images/trips/<slug>/`
+2. Add a `cover.jpeg` and numbered photos (`1.jpeg`, `2.jpeg`, etc.)
+3. **Convert HEIC/PNG to JPEG** before adding (browsers can't display HEIC):
+   ```bash
+   sips -s format jpeg photo.HEIC --out photo.jpeg
+   ```
+4. **Compress for web** (max 1600px wide, 75% quality):
+   ```bash
+   sips --resampleWidth 1600 -s format jpeg -s formatOptions 75 photo.jpeg --out photo.jpeg
+   ```
+5. Target: each image under 500KB, cover under 1MB.
+
+## Step 4 — Publish
+
+```bash
+git add -A
+git commit -m "Add <trip-name> trip post with photos"
+git push origin main
+```
+
+Vercel auto-deploys from `main`. Check the deployment at the Vercel dashboard.
+
+## Checklist
+
+- [ ] Frontmatter passes schema (no empty bookingLinks, valid rating, correct category)
+- [ ] All images are JPEG (not HEIC/PNG/JPG uppercase)
+- [ ] Images compressed (under 500KB each)
+- [ ] Cover image set and exists
+- [ ] `draft: false` if ready to publish
+- [ ] Cost table totals match `totalCost` in frontmatter
+- [ ] Pushed to `main` for Vercel deployment
